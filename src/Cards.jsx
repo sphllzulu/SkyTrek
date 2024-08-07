@@ -1,27 +1,70 @@
+// import * as React from 'react';
+// import { styled } from '@mui/material/styles';
+// import Box from '@mui/material/Box';
+// import Paper from '@mui/material/Paper';
+// import Grid from '@mui/material/Grid';
+// import WeatherApp from './Weather';
+
+// const Item = styled(Paper)(({ theme }) => ({
+//   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : 'pink',
+//   ...theme.typography.body2,
+//   padding: theme.spacing(1),
+//   textAlign: 'center',
+//   color: theme.palette.text.secondary,
+// }));
+
+// export default function BasicGrid() {
+//   return (
+//     <Box sx={{ flexGrow: 1, padding:4}}>
+//       <Grid container spacing={2}>
+//         <Grid item xs={4}>
+//           <Item> <WeatherApp/> </Item>
+//         </Grid>
+//         <Grid item xs={4}>
+//           <Item>xs=4</Item>
+//         </Grid>
+//         <Grid item xs={4}>
+//           <Item>xs=4</Item>
+//         </Grid>
+//         <Grid item xs={8}>
+//           <Item>xs=8</Item>
+//         </Grid>
+//       </Grid>
+//     </Box>
+//   );
+// }
+
+
 import * as React from 'react';
-import { experimentalStyled as styled } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
-import Grid from '@mui/material/Unstable_Grid2';
+import Grid from '@mui/material/Grid';
+import WeatherApp from './Weather';
+import Forecasts from './Forecasts';
+import HourlyDaily from './HourlyDaily';
 
 const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : 'grey',
+  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : 'pink',
   ...theme.typography.body2,
-  padding: theme.spacing(2),
+  padding: theme.spacing(2), // Increased padding for better spacing
   textAlign: 'center',
   color: theme.palette.text.secondary,
 }));
 
-export default function ResponsiveGrid() {
+export default function BasicGrid() {
   return (
-    <Box sx={{ flexGrow: 1, padding:3 }}>
-      <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
-        {Array.from(Array(6)).map((_, index) => (
-          <Grid xs={2} sm={4} md={4} key={index}>
-            <Item>xs=2</Item>
-          </Grid>
-        ))}
-      </Grid>
+    <Box sx={{ flexGrow: 1, padding: 4 }}>
+      {/* <Grid container spacing={2}> */}
+        {/* <Grid item xs={12} sm={6} md={8}> */}
+          <Item>
+            <WeatherApp />
+          </Item>
+        {/* </Grid> */}
+        
+        
+        
+      {/* </Grid> */}
     </Box>
   );
 }
