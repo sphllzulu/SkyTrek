@@ -116,127 +116,207 @@
 // export default WeatherApp;
 
 
-// import React, { useState, useEffect } from 'react';
-// import axios from 'axios';
-// import CircularProgress from '@mui/material/CircularProgress';
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// import { faFrown } from '@fortawesome/free-solid-svg-icons';
-// import HourlyDaily from './HourlyDaily';
 
-// import './Weather.css';
 
-// function WeatherApp() {
-//   const [weather, setWeather] = useState({
-//     loading: false,
-//     data: {},
-//     error: false,
-//   });
-//   const [coordinates, setCoordinates] = useState({ lat: null, lon: null });
 
-//   useEffect(() => {
-//     // Function to get the user's current location
-//     const getLocation = () => {
-//       if (navigator.geolocation) {
-//         navigator.geolocation.getCurrentPosition(
-//           (position) => {
-//             const { latitude, longitude } = position.coords;
-//             setCoordinates({ lat: latitude, lon: longitude });
-//           },
-//           (error) => {
-//             console.log('Error getting location', error);
-//             setWeather({ ...weather, error: true });
-//           }
-//         );
-//       } else {
-//         console.log('Geolocation is not supported by this browser.');
-//         setWeather({ ...weather, error: true });
-//       }
-//     };
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import CircularProgress from '@mui/material/CircularProgress';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFrown } from '@fortawesome/free-solid-svg-icons';
+import HourlyDaily from './HourlyDaily';
 
-//     // Fetch weather data when coordinates are set
-//     if (coordinates.lat && coordinates.lon) {
-//       fetchWeatherData(coordinates.lat, coordinates.lon);
-//     } else {
-//       getLocation();
-//     }
-//   }, [coordinates]);
+import './Weather.css';
 
-//   const fetchWeatherData = async (lat, lon) => {
-//     setWeather({ ...weather, loading: true });
-//     const url = 'https://api.openweathermap.org/data/2.5/onecall';
-//     const api_key = 'f00c38e0279b7bc85480c3fe775d518c';
+function WeatherApp() {
+  const [weather, setWeather] = useState({
+    loading: false,
+    data: {},
+    error: false,
+  });
+  const [coordinates, setCoordinates] = useState({ lat: null, lon: null });
+  const [locations, setLocations] = useState([]);
+  const [selectedLocation, setSelectedLocation] = useState(null);
 
-//     try {
-//       const response = await axios.get(url, {
-//         params: {
-//           lat: lat,
-//           lon: lon,
-//           exclude: 'minutely',
-//           units: 'metric',
-//           appid: api_key,
-//         },
-//       });
-//       setWeather({ data: response.data, loading: false, error: false });
-//     } catch (error) {
-//       setWeather({ ...weather, data: {}, error: true });
-//       console.log('Error fetching weather data', error);
-//     }
-//   };
+  useEffect(() => {
+    // Function to get the user's current location
+    const getLocation = () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            setCoordinates({ lat: latitude, lon: longitude });
+          },
+          (error) => {
+            console.log('Error getting location', error);
+            fetchWeatherFromCache();
+          }
+        );
+      } else {
+        console.log('Geolocation is not supported by this browser.');
+        fetchWeatherFromCache();
+      }
+    };
 
-//   const toDateFunction = () => {
-//     const months = [
-//       'January', 'February', 'March', 'April', 'May', 'June',
-//       'July', 'August', 'September', 'October', 'November', 'December',
-//     ];
-//     const WeekDays = [
-//       'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
-//     ];
-//     const currentDate = new Date();
-//     const date = `${WeekDays[currentDate.getDay()]} ${currentDate.getDate()} ${months[currentDate.getMonth()]}`;
-//     return date;
-//   };
+    // Fetch weather data when coordinates are set or selected location changes
+    if (coordinates.lat && coordinates.lon) {
+      fetchWeatherData(coordinates.lat, coordinates.lon);
+    } else if (selectedLocation) {
+      fetchWeatherDataByLocation(selectedLocation);
+    } else {
+      fetchWeatherFromCache();
+    }
+  }, [coordinates, selectedLocation]);
 
-//   return (
-//     <div className="App">
-//       {weather.loading && <CircularProgress color="inherit" />}
-//       {weather.error && (
-//         <span className="error-message">
-//           <FontAwesomeIcon icon={faFrown} />
-//           <span style={{ fontSize: '20px' }}>Unable to fetch weather data</span>
-//         </span>
-//       )}
-//       {weather.data && weather.data.current && (
-//         <div>
-//           <div className="city-name">
-//             <h2>
-//               Current Location
-//             </h2>
-//           </div>
-//           <div className="date">
-//             <span>{toDateFunction()}</span>
-//           </div>
-//           <div className="icon-temp">
-//             <img
-//               src={`https://openweathermap.org/img/wn/${weather.data.current.weather[0].icon}@2x.png`}
-//               alt={weather.data.current.weather[0].description}
-//             />
-//             {Math.round(weather.data.current.temp)}
-//             <sup className="deg">°C</sup>
-//           </div>
-//           <div className="des-wind">
-//             <p>{weather.data.current.weather[0].description.toUpperCase()}</p>
-//             <p>Wind Speed: {weather.data.current.wind_speed} m/s</p>
-//             <p>Humidity: {weather.data.current.humidity}%</p>
-//             <p>Precipitation: {weather.data.current.rain ? weather.data.current.rain['1h'] : 0} mm</p>
-//           </div>
-//           <HourlyDaily hourly={weather.data.hourly} daily={weather.data.daily} />
-//         </div>
-//       )}
-//     </div>
-//   );
-// }
+  const fetchWeatherData = async (lat, lon) => {
+    setWeather({ ...weather, loading: true });
+    const url = 'https://api.openweathermap.org/data/2.5/onecall';
+    const api_key = 'f00c38e0279b7bc85480c3fe775d518c';
 
-// export default WeatherApp;
+    try {
+      const response = await axios.get(url, {
+        params: {
+          lat: lat,
+          lon: lon,
+          exclude: 'minutely',
+          units: 'metric',
+          appid: api_key,
+        },
+      });
+      setWeather({ data: response.data, loading: false, error: false });
+      updateCache(lat, lon, response.data); // Update cache
+    } catch (error) {
+      console.log('Error fetching weather data', error);
+      fetchWeatherFromCache(); // Fallback to cache on error
+    }
+  };
+
+  const fetchWeatherDataByLocation = async (location) => {
+    setWeather({ ...weather, loading: true });
+    const url = 'https://api.openweathermap.org/data/2.5/weather';
+    const api_key = 'f00c38e0279b7bc85480c3fe775d518c';
+
+    try {
+      const response = await axios.get(url, {
+        params: {
+          q: location,
+          units: 'metric',
+          appid: api_key,
+        },
+      });
+      const { lat, lon } = response.data.coord;
+      fetchWeatherData(lat, lon);
+    } catch (error) {
+      setWeather({ ...weather, data: {}, error: true });
+      console.log('Error fetching weather data by location', error);
+    }
+  };
+
+  const fetchWeatherFromCache = () => {
+    const cachedWeather = localStorage.getItem('weatherData');
+    if (cachedWeather) {
+      setWeather({ data: JSON.parse(cachedWeather), loading: false, error: false });
+    }
+  };
+
+  const updateCache = (lat, lon, data) => {
+    const cacheKey = `${lat},${lon}`;
+    const cachedLocations = JSON.parse(localStorage.getItem('savedLocations')) || {};
+    cachedLocations[cacheKey] = data;
+    localStorage.setItem('savedLocations', JSON.stringify(cachedLocations));
+  };
+
+  const handleAddLocation = () => {
+    const location = prompt('Enter a city name to add:');
+    if (location) {
+      fetchWeatherDataByLocation(location);
+      setLocations([...locations, location]);
+    }
+  };
+
+  const handleRemoveLocation = (location) => {
+    setLocations(locations.filter(loc => loc !== location));
+    if (selectedLocation === location) {
+      setSelectedLocation(null);
+      fetchWeatherFromCache();
+    }
+  };
+
+  const handleSelectLocation = (location) => {
+    setSelectedLocation(location);
+    fetchWeatherDataByLocation(location);
+  };
+
+  const toDateFunction = () => {
+    const months = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December',
+    ];
+    const WeekDays = [
+      'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
+    ];
+    const currentDate = new Date();
+    const date = `${WeekDays[currentDate.getDay()]} ${currentDate.getDate()} ${months[currentDate.getMonth()]}`;
+    return date;
+  };
+
+  const locationData = weather.data.current ? weather.data : null;
+
+  return (
+    <div className="App">
+      <div className="search-bar">
+        <button onClick={handleAddLocation}>Add Location</button>
+        <div className="location-list">
+          {locations.map((loc, index) => (
+            <div key={index} className="location-item">
+              <span onClick={() => handleSelectLocation(loc)}>{loc}</span>
+              <button onClick={() => handleRemoveLocation(loc)}>Remove</button>
+            </div>
+          ))}
+        </div>
+      </div>
+      {weather.loading && <CircularProgress color="inherit" />}
+      {weather.error && (
+        <span className="error-message">
+          <FontAwesomeIcon icon={faFrown} />
+          <span style={{ fontSize: '20px' }}>Unable to fetch weather data</span>
+        </span>
+      )}
+      {locationData && locationData.current && (
+        <div>
+          <div className="city-name">
+            <h2>
+              {selectedLocation || 'Current Location'}
+            </h2>
+          </div>
+          <div className="date">
+            <span>{toDateFunction()}</span>
+          </div>
+          <div className="icon-temp">
+            <img
+              src={`https://openweathermap.org/img/wn/${locationData.current.weather[0].icon}@2x.png`}
+              alt={locationData.current.weather[0].description}
+            />
+            {Math.round(locationData.current.temp)}
+            <sup className="deg">°C</sup>
+          </div>
+          <div className="des-wind">
+            <p>{locationData.current.weather[0].description.toUpperCase()}</p>
+            <p>Wind Speed: {locationData.current.wind_speed} m/s</p>
+            <p>Humidity: {locationData.current.humidity}%</p>
+            <p>Precipitation: {locationData.current.rain ? locationData.current.rain['1h'] : 0} mm</p>
+          </div>
+          <HourlyDaily hourly={locationData.hourly} daily={locationData.daily} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default WeatherApp;
+
+
+
 
 
 // import React, { useState, useEffect } from 'react';
@@ -583,182 +663,554 @@
 
 
 
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import CircularProgress from '@mui/material/CircularProgress';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFrown } from '@fortawesome/free-solid-svg-icons';
-import HourlyDaily from './HourlyDaily';
+// import React, { useState, useEffect } from 'react';
+// import axios from 'axios';
+// import CircularProgress from '@mui/material/CircularProgress';
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+// import { faFrown } from '@fortawesome/free-solid-svg-icons';
+// import HourlyDaily from './HourlyDaily';
 
-import './Weather.css';
+// import './Weather.css';
 
-function WeatherApp() {
-  const [weather, setWeather] = useState({
-    loading: false,
-    data: {},
-    error: false,
-  });
-  const [coordinates, setCoordinates] = useState({ lat: null, lon: null });
-  const [searchInput, setSearchInput] = useState('');
-  const [searchData, setSearchData] = useState(null);
-  const [useCurrentLocation, setUseCurrentLocation] = useState(true);
+// function WeatherApp() {
+//   const [weather, setWeather] = useState({
+//     loading: false,
+//     data: {},
+//     error: false,
+//   });
+//   const [coordinates, setCoordinates] = useState({ lat: null, lon: null });
+//   const [searchInput, setSearchInput] = useState('');
+//   const [searchData, setSearchData] = useState(null);
+//   const [useCurrentLocation, setUseCurrentLocation] = useState(true);
 
-  useEffect(() => {
-    const fetchWeatherFromCache = () => {
-      const cachedWeather = localStorage.getItem('weatherData');
-      if (cachedWeather) {
-        setWeather({ data: JSON.parse(cachedWeather), loading: false, error: false });
-      }
-    };
+//   useEffect(() => {
+//     const fetchWeatherFromCache = () => {
+//       const cachedWeather = localStorage.getItem('weatherData');
+//       if (cachedWeather) {
+//         setWeather({ data: JSON.parse(cachedWeather), loading: false, error: false });
+//       }
+//     };
 
-    if (useCurrentLocation) {
-      // Function to get the user's current location
-      const getLocation = () => {
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              const { latitude, longitude } = position.coords;
-              setCoordinates({ lat: latitude, lon: longitude });
-            },
-            (error) => {
-              console.log('Error getting location', error);
-              setWeather({ ...weather, error: true });
-            }
-          );
-        } else {
-          console.log('Geolocation is not supported by this browser.');
-          setWeather({ ...weather, error: true });
-        }
-      };
+//     if (useCurrentLocation) {
+//       // Function to get the user's current location
+//       const getLocation = () => {
+//         if (navigator.geolocation) {
+//           navigator.geolocation.getCurrentPosition(
+//             (position) => {
+//               const { latitude, longitude } = position.coords;
+//               setCoordinates({ lat: latitude, lon: longitude });
+//             },
+//             (error) => {
+//               console.log('Error getting location', error);
+//               setWeather({ ...weather, error: true });
+//             }
+//           );
+//         } else {
+//           console.log('Geolocation is not supported by this browser.');
+//           setWeather({ ...weather, error: true });
+//         }
+//       };
 
-      fetchWeatherFromCache();
-      getLocation();
-    } else if (searchInput) {
-      fetchWeatherDataByLocation(searchInput);
-    }
-  }, [coordinates, searchInput, useCurrentLocation]);
+//       fetchWeatherFromCache();
+//       getLocation();
+//     } else if (searchInput) {
+//       fetchWeatherDataByLocation(searchInput);
+//     }
+//   }, [coordinates, searchInput, useCurrentLocation]);
 
-  const fetchWeatherData = async (lat, lon) => {
-    setWeather({ ...weather, loading: true });
-    const url = 'https://api.openweathermap.org/data/2.5/onecall';
-    const api_key = 'f00c38e0279b7bc85480c3fe775d518c';
+//   const fetchWeatherData = async (lat, lon) => {
+//     setWeather({ ...weather, loading: true });
+//     const url = 'https://api.openweathermap.org/data/2.5/onecall';
+//     const api_key = 'f00c38e0279b7bc85480c3fe775d518c';
 
-    try {
-      const response = await axios.get(url, {
-        params: {
-          lat: lat,
-          lon: lon,
-          exclude: 'minutely',
-          units: 'metric',
-          appid: api_key,
-        },
-      });
-      localStorage.setItem('weatherData', JSON.stringify(response.data)); // Cache weather data
-      setWeather({ data: response.data, loading: false, error: false });
-    } catch (error) {
-      setWeather({ ...weather, data: {}, error: true });
-      console.log('Error fetching weather data', error);
-    }
-  };
+//     try {
+//       const response = await axios.get(url, {
+//         params: {
+//           lat: lat,
+//           lon: lon,
+//           exclude: 'minutely',
+//           units: 'metric',
+//           appid: api_key,
+//         },
+//       });
+//       localStorage.setItem('weatherData', JSON.stringify(response.data)); // Cache weather data
+//       setWeather({ data: response.data, loading: false, error: false });
+//     } catch (error) {
+//       setWeather({ ...weather, data: {}, error: true });
+//       console.log('Error fetching weather data', error);
+//     }
+//   };
 
-  const fetchWeatherDataByLocation = async (location) => {
-    setWeather({ ...weather, loading: true });
-    const url = 'https://api.openweathermap.org/data/2.5/weather';
-    const api_key = 'f00c38e0279b7bc85480c3fe775d518c';
+//   const fetchWeatherDataByLocation = async (location) => {
+//     setWeather({ ...weather, loading: true });
+//     const url = 'https://api.openweathermap.org/data/2.5/weather';
+//     const api_key = 'f00c38e0279b7bc85480c3fe775d518c';
 
-    try {
-      const response = await axios.get(url, {
-        params: {
-          q: location,
-          units: 'metric',
-          appid: api_key,
-        },
-      });
-      const { lat, lon } = response.data.coord;
-      fetchWeatherData(lat, lon);
-      setSearchData(response.data);
-      setUseCurrentLocation(false);
-    } catch (error) {
-      setWeather({ ...weather, data: {}, error: true });
-      console.log('Error fetching weather data by location', error);
-    }
-  };
+//     try {
+//       const response = await axios.get(url, {
+//         params: {
+//           q: location,
+//           units: 'metric',
+//           appid: api_key,
+//         },
+//       });
+//       const { lat, lon } = response.data.coord;
+//       fetchWeatherData(lat, lon);
+//       setSearchData(response.data);
+//       setUseCurrentLocation(false);
+//     } catch (error) {
+//       setWeather({ ...weather, data: {}, error: true });
+//       console.log('Error fetching weather data by location', error);
+//     }
+//   };
 
-  const handleSearch = (event) => {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      fetchWeatherDataByLocation(searchInput);
-    }
-  };
+//   const handleSearch = (event) => {
+//     if (event.key === 'Enter') {
+//       event.preventDefault();
+//       fetchWeatherDataByLocation(searchInput);
+//     }
+//   };
 
-  const toDateFunction = () => {
-    const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December',
-    ];
-    const WeekDays = [
-      'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
-    ];
-    const currentDate = new Date();
-    const date = `${WeekDays[currentDate.getDay()]} ${currentDate.getDate()} ${months[currentDate.getMonth()]}`;
-    return date;
-  };
+//   const toDateFunction = () => {
+//     const months = [
+//       'January', 'February', 'March', 'April', 'May', 'June',
+//       'July', 'August', 'September', 'October', 'November', 'December',
+//     ];
+//     const WeekDays = [
+//       'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
+//     ];
+//     const currentDate = new Date();
+//     const date = `${WeekDays[currentDate.getDay()]} ${currentDate.getDate()} ${months[currentDate.getMonth()]}`;
+//     return date;
+//   };
 
-  const locationData = useCurrentLocation ? weather.data.current : searchData;
+//   const locationData = useCurrentLocation ? weather.data.current : searchData;
 
-  return (
-    <div className="App">
-      <div className="search-bar">
-        <input
-          type="text"
-          className="city-search"
-          placeholder="Enter City Name.."
-          value={searchInput}
-          onChange={(event) => setSearchInput(event.target.value)}
-          onKeyPress={handleSearch}
-        />
-        <button onClick={() => setUseCurrentLocation(true)}>Use Current Location</button>
-      </div>
-      {weather.loading && <CircularProgress color="inherit" />}
-      {weather.error && (
-        <span className="error-message">
-          <FontAwesomeIcon icon={faFrown} />
-          <span style={{ fontSize: '20px' }}>Unable to fetch weather data</span>
-        </span>
-      )}
-      {locationData && locationData.main && (
-        <div>
-          <div className="city-name">
-            <h2>
-              {useCurrentLocation ? 'Current Location' : locationData.name}, 
-              <span>{useCurrentLocation ? '' : locationData.sys.country}</span>
-            </h2>
-          </div>
-          <div className="date">
-            <span>{toDateFunction()}</span>
-          </div>
-          <div className="icon-temp">
-            <img
-              src={`https://openweathermap.org/img/wn/${locationData.weather[0].icon}@2x.png`}
-              alt={locationData.weather[0].description}
-            />
-            {Math.round(locationData.main.temp)}
-            <sup className="deg">°C</sup>
-          </div>
-          <div className="des-wind">
-            <p>{locationData.weather[0].description.toUpperCase()}</p>
-            <p>Wind Speed: {locationData.wind.speed} m/s</p>
-            <p>Humidity: {locationData.main.humidity}%</p>
-            <p>Precipitation: {locationData.rain ? locationData.rain['1h'] : 0} mm</p>
-          </div>
-          {weather.data && weather.data.hourly && weather.data.daily && (
-            <HourlyDaily hourly={weather.data.hourly} daily={weather.data.daily} />
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
+//   return (
+//     <div className="App">
+//       <div className="search-bar">
+//         <input
+//           type="text"
+//           className="city-search"
+//           placeholder="Enter City Name.."
+//           value={searchInput}
+//           onChange={(event) => setSearchInput(event.target.value)}
+//           onKeyPress={handleSearch}
+//         />
+//         <button onClick={() => setUseCurrentLocation(true)}>Use Current Location</button>
+//       </div>
+//       {weather.loading && <CircularProgress color="inherit" />}
+//       {weather.error && (
+//         <span className="error-message">
+//           <FontAwesomeIcon icon={faFrown} />
+//           <span style={{ fontSize: '20px' }}>Unable to fetch weather data</span>
+//         </span>
+//       )}
+//       {locationData && locationData.main && (
+//         <div>
+//           <div className="city-name">
+//             <h2>
+//               {useCurrentLocation ? 'Current Location' : locationData.name}, 
+//               <span>{useCurrentLocation ? '' : locationData.sys.country}</span>
+//             </h2>
+//           </div>
+//           <div className="date">
+//             <span>{toDateFunction()}</span>
+//           </div>
+//           <div className="icon-temp">
+//             <img
+//               src={`https://openweathermap.org/img/wn/${locationData.weather[0].icon}@2x.png`}
+//               alt={locationData.weather[0].description}
+//             />
+//             {Math.round(locationData.main.temp)}
+//             <sup className="deg">°C</sup>
+//           </div>
+//           <div className="des-wind">
+//             <p>{locationData.weather[0].description.toUpperCase()}</p>
+//             <p>Wind Speed: {locationData.wind.speed} m/s</p>
+//             <p>Humidity: {locationData.main.humidity}%</p>
+//             <p>Precipitation: {locationData.rain ? locationData.rain['1h'] : 0} mm</p>
+//           </div>
+//           {weather.data && weather.data.hourly && weather.data.daily && (
+//             <HourlyDaily hourly={weather.data.hourly} daily={weather.data.daily} />
+//           )}
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
 
-export default WeatherApp;
+// export default WeatherApp;
 
+
+
+// import React, { useState, useEffect } from 'react';
+// import axios from 'axios';
+// import CircularProgress from '@mui/material/CircularProgress';
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+// import { faFrown } from '@fortawesome/free-solid-svg-icons';
+// import HourlyDaily from './HourlyDaily';
+
+// import './Weather.css';
+
+// function WeatherApp() {
+//   const [weather, setWeather] = useState({
+//     loading: false,
+//     data: {},
+//     error: false,
+//   });
+//   const [coordinates, setCoordinates] = useState({ lat: null, lon: null });
+//   const [searchInput, setSearchInput] = useState('');
+//   const [searchData, setSearchData] = useState(null);
+//   const [useCurrentLocation, setUseCurrentLocation] = useState(true);
+
+//   useEffect(() => {
+//     const fetchWeatherFromCache = () => {
+//       const cachedWeather = localStorage.getItem('weatherData');
+//       if (cachedWeather) {
+//         setWeather({ data: JSON.parse(cachedWeather), loading: false, error: false });
+//       }
+//     };
+
+//     if (useCurrentLocation) {
+//       // Function to get the user's current location
+//       const getLocation = () => {
+//         if (navigator.geolocation) {
+//           navigator.geolocation.getCurrentPosition(
+//             (position) => {
+//               const { latitude, longitude } = position.coords;
+//               setCoordinates({ lat: latitude, lon: longitude });
+//             },
+//             (error) => {
+//               console.log('Error getting location', error);
+//               setWeather({ ...weather, error: true });
+//             }
+//           );
+//         } else {
+//           console.log('Geolocation is not supported by this browser.');
+//           setWeather({ ...weather, error: true });
+//         }
+//       };
+
+//       fetchWeatherFromCache();
+//       getLocation();
+//     } else if (searchInput) {
+//       fetchWeatherDataByLocation(searchInput);
+//     }
+//   }, [coordinates, searchInput, useCurrentLocation]);
+
+//   useEffect(() => {
+//     if (coordinates.lat && coordinates.lon) {
+//       fetchWeatherData(coordinates.lat, coordinates.lon);
+//     }
+//   }, [coordinates]);
+
+//   const fetchWeatherData = async (lat, lon) => {
+//     setWeather({ ...weather, loading: true });
+//     const url = 'https://api.openweathermap.org/data/2.5/onecall';
+//     const api_key = 'f00c38e0279b7bc85480c3fe775d518c';
+
+//     try {
+//       const response = await axios.get(url, {
+//         params: {
+//           lat: lat,
+//           lon: lon,
+//           exclude: 'minutely',
+//           units: 'metric',
+//           appid: api_key,
+//         },
+//       });
+//       localStorage.setItem('weatherData', JSON.stringify(response.data)); // Cache weather data
+//       setWeather({ data: response.data, loading: false, error: false });
+//     } catch (error) {
+//       setWeather({ ...weather, data: {}, error: true });
+//       console.log('Error fetching weather data', error);
+//     }
+//   };
+
+//   const fetchWeatherDataByLocation = async (location) => {
+//     setWeather({ ...weather, loading: true });
+//     const url = 'https://api.openweathermap.org/data/2.5/weather';
+//     const api_key = 'f00c38e0279b7bc85480c3fe775d518c';
+
+//     try {
+//       const response = await axios.get(url, {
+//         params: {
+//           q: location,
+//           units: 'metric',
+//           appid: api_key,
+//         },
+//       });
+//       const { lat, lon } = response.data.coord;
+//       setCoordinates({ lat, lon });
+//       setSearchData(response.data);
+//       setUseCurrentLocation(false);
+//     } catch (error) {
+//       setWeather({ ...weather, data: {}, error: true });
+//       console.log('Error fetching weather data by location', error);
+//     }
+//   };
+
+//   const handleSearch = (event) => {
+//     if (event.key === 'Enter') {
+//       event.preventDefault();
+//       fetchWeatherDataByLocation(searchInput);
+//     }
+//   };
+
+//   const toDateFunction = () => {
+//     const months = [
+//       'January', 'February', 'March', 'April', 'May', 'June',
+//       'July', 'August', 'September', 'October', 'November', 'December',
+//     ];
+//     const WeekDays = [
+//       'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
+//     ];
+//     const currentDate = new Date();
+//     const date = `${WeekDays[currentDate.getDay()]} ${currentDate.getDate()} ${months[currentDate.getMonth()]}`;
+//     return date;
+//   };
+
+//   const locationData = useCurrentLocation ? weather.data.current : searchData;
+
+//   return (
+//     <div className="App">
+//       <div className="search-bar">
+//         <input
+//           type="text"
+//           className="city-search"
+//           placeholder="Enter City Name.."
+//           value={searchInput}
+//           onChange={(event) => setSearchInput(event.target.value)}
+//           onKeyPress={handleSearch}
+//         />
+//         <button onClick={() => setUseCurrentLocation(true)}>Use Current Location</button>
+//       </div>
+//       {weather.loading && <CircularProgress color="inherit" />}
+//       {weather.error && (
+//         <span className="error-message">
+//           <FontAwesomeIcon icon={faFrown} />
+//           <span style={{ fontSize: '20px' }}>Unable to fetch weather data</span>
+//         </span>
+//       )}
+//       {locationData && locationData.main && (
+//         <div>
+//           <div className="city-name">
+//             <h2>
+//               {useCurrentLocation ? 'Current Location' : locationData.name}, 
+//               <span>{useCurrentLocation ? '' : locationData.sys.country}</span>
+//             </h2>
+//           </div>
+//           <div className="date">
+//             <span>{toDateFunction()}</span>
+//           </div>
+//           <div className="icon-temp">
+//             <img
+//               src={`https://openweathermap.org/img/wn/${locationData.weather[0].icon}@2x.png`}
+//               alt={locationData.weather[0].description}
+//             />
+//             {Math.round(locationData.main.temp)}
+//             <sup className="deg">°C</sup>
+//           </div>
+//           <div className="des-wind">
+//             <p>{locationData.weather[0].description.toUpperCase()}</p>
+//             <p>Wind Speed: {locationData.wind.speed} m/s</p>
+//             <p>Humidity: {locationData.main.humidity}%</p>
+//             <p>Precipitation: {locationData.rain ? locationData.rain['1h'] : 0} mm</p>
+//           </div>
+//           {weather.data && weather.data.hourly && weather.data.daily && (
+//             <HourlyDaily hourly={weather.data.hourly} daily={weather.data.daily} />
+//           )}
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
+
+// export default WeatherApp;
+
+
+
+// import React, { useState, useEffect } from 'react';
+// import axios from 'axios';
+// import CircularProgress from '@mui/material/CircularProgress';
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+// import { faFrown } from '@fortawesome/free-solid-svg-icons';
+// import HourlyDaily from './HourlyDaily';
+
+// import './Weather.css';
+
+// function WeatherApp() {
+//   const [weather, setWeather] = useState({
+//     loading: false,
+//     data: {},
+//     error: false,
+//   });
+//   const [coordinates, setCoordinates] = useState({ lat: null, lon: null });
+//   const [searchInput, setSearchInput] = useState('');
+//   const [searchData, setSearchData] = useState(null);
+//   const [useCurrentLocation, setUseCurrentLocation] = useState(true);
+
+//   useEffect(() => {
+//     const fetchWeatherFromCache = () => {
+//       const cachedWeather = localStorage.getItem('weatherData');
+//       if (cachedWeather) {
+//         setWeather({ data: JSON.parse(cachedWeather), loading: false, error: false });
+//       }
+//     };
+
+//     if (useCurrentLocation) {
+//       const getLocation = () => {
+//         if (navigator.geolocation) {
+//           navigator.geolocation.getCurrentPosition(
+//             (position) => {
+//               const { latitude, longitude } = position.coords;
+//               setCoordinates({ lat: latitude, lon: longitude });
+//             },
+//             (error) => {
+//               console.log('Error getting location', error);
+//               setWeather({ ...weather, error: true });
+//             }
+//           );
+//         } else {
+//           console.log('Geolocation is not supported by this browser.');
+//           setWeather({ ...weather, error: true });
+//         }
+//       };
+
+//       fetchWeatherFromCache();
+//       getLocation();
+//     } else if (searchInput) {
+//       fetchWeatherDataByLocation(searchInput);
+//     }
+//   }, [useCurrentLocation, searchInput]);
+
+//   useEffect(() => {
+//     if (coordinates.lat && coordinates.lon) {
+//       fetchWeatherData(coordinates.lat, coordinates.lon);
+//     }
+//   }, [coordinates]);
+
+//   const fetchWeatherData = async (lat, lon) => {
+//     setWeather({ ...weather, loading: true });
+//     const url = 'https://api.openweathermap.org/data/2.5/onecall';
+//     const api_key = 'f00c38e0279b7bc85480c3fe775d518c';
+
+//     try {
+//       const response = await axios.get(url, {
+//         params: {
+//           lat: lat,
+//           lon: lon,
+//           exclude: 'minutely',
+//           units: 'metric',
+//           appid: api_key,
+//         },
+//       });
+//       localStorage.setItem('weatherData', JSON.stringify(response.data)); // Cache weather data
+//       setWeather({ data: response.data, loading: false, error: false });
+//     } catch (error) {
+//       setWeather({ ...weather, data: {}, error: true });
+//       console.log('Error fetching weather data', error);
+//     }
+//   };
+
+//   const fetchWeatherDataByLocation = async (location) => {
+//     setWeather({ ...weather, loading: true });
+//     const url = 'https://api.openweathermap.org/data/2.5/weather';
+//     const api_key = 'f00c38e0279b7bc85480c3fe775d518c';
+
+//     try {
+//       const response = await axios.get(url, {
+//         params: {
+//           q: location,
+//           units: 'metric',
+//           appid: api_key,
+//         },
+//       });
+//       const { lat, lon } = response.data.coord;
+//       setCoordinates({ lat, lon });
+//       setSearchData(response.data);
+//       setUseCurrentLocation(false);
+//     } catch (error) {
+//       setWeather({ ...weather, data: {}, error: true });
+//       console.log('Error fetching weather data by location', error);
+//     }
+//   };
+
+//   const handleSearch = (event) => {
+//     if (event.key === 'Enter') {
+//       event.preventDefault();
+//       fetchWeatherDataByLocation(searchInput);
+//     }
+//   };
+
+//   const toDateFunction = () => {
+//     const months = [
+//       'January', 'February', 'March', 'April', 'May', 'June',
+//       'July', 'August', 'September', 'October', 'November', 'December',
+//     ];
+//     const WeekDays = [
+//       'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
+//     ];
+//     const currentDate = new Date();
+//     const date = `${WeekDays[currentDate.getDay()]} ${currentDate.getDate()} ${months[currentDate.getMonth()]}`;
+//     return date;
+//   };
+
+//   const locationData = useCurrentLocation ? weather.data.current : searchData;
+
+//   return (
+//     <div className="App">
+//       <div className="search-bar">
+//         <input
+//           type="text"
+//           className="city-search"
+//           placeholder="Enter City Name.."
+//           value={searchInput}
+//           onChange={(event) => setSearchInput(event.target.value)}
+//           onKeyPress={handleSearch}
+//         />
+//         <button onClick={() => setUseCurrentLocation(true)}>Use Current Location</button>
+//       </div>
+//       {weather.loading && <CircularProgress color="inherit" />}
+//       {weather.error && (
+//         <span className="error-message">
+//           <FontAwesomeIcon icon={faFrown} />
+//           <span style={{ fontSize: '20px' }}>Unable to fetch weather data</span>
+//         </span>
+//       )}
+//       {locationData && locationData.main && (
+//         <div>
+//           <div className="city-name">
+//             <h2>
+//               {useCurrentLocation ? 'Current Location' : locationData.name}, 
+//               <span>{useCurrentLocation ? '' : locationData.sys.country}</span>
+//             </h2>
+//           </div>
+//           <div className="date">
+//             <span>{toDateFunction()}</span>
+//           </div>
+//           <div className="icon-temp">
+//             <img
+//               src={`https://openweathermap.org/img/wn/${locationData.weather[0].icon}@2x.png`}
+//               alt={locationData.weather[0].description}
+//             />
+//             {Math.round(locationData.main.temp)}
+//             <sup className="deg">°C</sup>
+//           </div>
+//           <div className="des-wind">
+//             <p>{locationData.weather[0].description.toUpperCase()}</p>
+//             <p>Wind Speed: {locationData.wind.speed} m/s</p>
+//             <p>Humidity: {locationData.main.humidity}%</p>
+//             <p>Precipitation: {locationData.rain ? locationData.rain['1h'] : 0} mm</p>
+//           </div>
+//           {weather.data && weather.data.hourly && weather.data.daily && (
+//             <HourlyDaily hourly={weather.data.hourly} daily={weather.data.daily} />
+//           )}
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
+
+// export default WeatherApp;
