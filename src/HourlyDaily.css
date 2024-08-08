@@ -19,7 +19,9 @@
   
   .hourly-item, .daily-item {
     flex: 1;
-    text-align: center;
+    /* text-align: center; */
+    
+    flex-direction: column;
   }
   
   .hourly-item img, .daily-item img {
@@ -30,7 +32,7 @@
 
   @media (max-width: 600px) {
     .hourly-forecasts, .daily-forecasts {
-      overflow-x: scroll; 
+      /* overflow-x: scroll;  */
       padding: 0 1rem; 
     }
     .daily-forecasts .small{
