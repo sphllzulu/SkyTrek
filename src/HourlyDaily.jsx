@@ -127,41 +127,41 @@ const HourlyDaily = ({ hourly, daily }) => {
   return (
     <div className="hourly-daily-container">
       <div className="hourly">
-        <h3>Hourly Forecast</h3>
+        <h3 style={{color:'lightgrey', fontSize:'30px'}}>Hourly Forecast</h3>
         <div className="hourly-forecasts">
           {hourly && hourly.length > 0 ? (
-            hourly.slice(0, 12).map((hour, index) => (
+            hourly.slice(0, 5).map((hour, index) => (
               <div key={index} className="hourly-item">
-                <p>{new Date(hour.dt * 1000).getHours()}:00</p>
+                <p style={{color:'white'}}>{new Date(hour.dt * 1000).getHours()}:00</p>
                 <img
                   src={`https://openweathermap.org/img/wn/${hour.weather[0].icon}@2x.png`}
                   alt={hour.weather[0].description}
                 />
-                <p>{Math.round(hour.temp)}°C</p>
+                <p style={{color:'white'}}>{Math.round(hour.temp)}°C</p>
               </div>
             ))
           ) : (
-            <p>No hourly data available</p>
+            <p style={{color:'white'}}>No hourly data available</p>
           )}
         </div>
       </div>
       <div className="daily">
-        <h3>Daily Forecast</h3>
+        <h2 style={{color:'lightgrey', fontSize:'30px'}}>Daily Forecast</h2>
         <div className="daily-forecasts">
           {daily && daily.length > 0 ? (
             daily.slice(1, 6).map((day, index) => (
               <div key={index} className="daily-item">
-                <p>{new Date(day.dt * 1000).toDateString()}</p>
+                <p style={{color:'white'}} className='small'>{new Date(day.dt * 1000).toDateString()}</p>
                 <img
                   src={`https://openweathermap.org/img/wn/${day.weather[0].icon}@2x.png`}
                   alt={day.weather[0].description}
                 />
-                <p>{Math.round(day.temp.day)}°C</p>
-                <p>{Math.round(day.temp.night)}°C</p>
+                <p  style={{color:'white'}}>{Math.round(day.temp.day)}°C</p>
+                <p style={{color:'white'}}>{Math.round(day.temp.night)}°C</p>
               </div>
             ))
           ) : (
-            <p>No daily data available</p>
+            <p style={{color:'white'}}>No daily data available</p>
           )}
         </div>
       </div>

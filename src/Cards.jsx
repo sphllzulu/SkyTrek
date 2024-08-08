@@ -45,7 +45,7 @@ import Forecasts from './Forecasts';
 import HourlyDaily from './HourlyDaily';
 
 const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : 'pink',
+  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#002E5D',
   ...theme.typography.body2,
   padding: theme.spacing(2), // Increased padding for better spacing
   textAlign: 'center',
@@ -54,7 +54,7 @@ const Item = styled(Paper)(({ theme }) => ({
 
 export default function BasicGrid() {
   return (
-    <Box sx={{ flexGrow: 1, padding: 4 }}>
+    <Box sx={{ flexGrow: 1, padding: 1 }}>
       {/* <Grid container spacing={2}> */}
         {/* <Grid item xs={12} sm={6} md={8}> */}
           <Item>

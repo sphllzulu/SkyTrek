@@ -13,7 +13,7 @@
   .hourly-forecasts, .daily-forecasts {
     display: flex;
     flex-wrap: wrap;
-    overflow-x: scroll;
+    /* overflow-x: scroll; */
     gap: 1rem;
   }
   
@@ -30,8 +30,11 @@
 
   @media (max-width: 600px) {
     .hourly-forecasts, .daily-forecasts {
-      overflow-x: scroll; /* Ensure scroll behavior on small screens */
-      padding: 0 1rem; /* Add some horizontal padding */
+      overflow-x: scroll; 
+      padding: 0 1rem; 
+    }
+    .daily-forecasts .small{
+      font-size: 1rem;
     }
   
     .hourly-item, .daily-item {
