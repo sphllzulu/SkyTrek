@@ -86,12 +86,12 @@ const Forecasts = ({ hourly, daily }) => {
   }
 
   return (
-    <Box sx={{ flexGrow: 1, padding: 4 , backgroundColor:'transparent'}}>
+    <Box sx={{ flexGrow: 1, padding: 4 , background:'blue'}}>
       <Typography variant="h6">Hourly Forecast</Typography>
       <Grid container spacing={2} sx={{ marginBottom: 4 }}>
         {hourly.slice(0, 5).map((hour, index) => (
           <Grid  item xs={2} key={index}>
-            <Item sx={{background:'transparent'}}>
+            <Item >
               <Typography variant="body2">{new Date(hour.dt * 1000).getHours()}:00</Typography>
               <img
                 src={`https://openweathermap.org/img/wn/${hour.weather[0].icon}@2x.png`}
