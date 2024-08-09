@@ -16,10 +16,10 @@ const HourlyDaily = ({ hourly, daily, unit }) => {
   return (
     <div className="hourly-daily-container">
       <div className="hourly">
-        <h3 style={{ color: 'lightgrey', fontSize: '30px' }}>Hourly Forecast</h3>
+        <h3 style={{ color: 'whitesmoke', fontSize: '30px' }}>Hourly Forecast</h3>
         <div className="hourly-forecasts">
           {hourly && hourly.length > 0 ? (
-            hourly.slice(0, 5).map((hour, index) => (
+            hourly.slice(0, 12).map((hour, index) => (
               <div key={index} className="hourly-item">
                 <p style={{ color: 'white' }}>{new Date(hour.dt * 1000).getHours()}:00</p>
                 <img
@@ -35,7 +35,7 @@ const HourlyDaily = ({ hourly, daily, unit }) => {
         </div>
       </div>
       <div className="daily">
-        <h2 style={{ color: 'lightgrey', fontSize: '30px' }}>Daily Forecast</h2>
+        <h2 style={{ color: 'whitesmoke', fontSize: '30px' }}>Daily Forecast</h2>
         <div className="daily-forecasts">
           {daily && daily.length > 0 ? (
             daily.slice(1, 6).map((day, index) => (

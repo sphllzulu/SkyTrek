@@ -25,7 +25,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/cards" element={<Cards/>}/>
-          {/* <Route path="/settings" element={<SettingsPage />} /> */}
+        
         </Routes>
       </Router>
     </ThemeProvider>
