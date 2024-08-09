@@ -178,7 +178,7 @@ function WeatherApp() {
           <select
             value={selectedLocation || ''}
             onChange={handleSelectLocation}
-            style={{backgroundColor:'transparent', border:'1px solid blue',padding:'10px', outline:'none'}}
+            style={{backgroundColor:'lightgrey', border:'none',padding:'10px', outline:'none'}}
           >
             <option value="" disabled>Previous location</option>
             {locations.length > 0 ? (
@@ -226,7 +226,7 @@ function WeatherApp() {
       )}
       {locationConsent === false && !selectedLocation && (
         <div className="location-prompt">
-          <p style={{ color: 'white' }}>Please enter a location to see weather information.</p>
+          <p style={{ color: 'white' }}></p>
         </div>
       )}
     </div>
