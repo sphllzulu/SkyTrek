@@ -14,9 +14,6 @@ The Weather App is a React application built with Vite that provides real-time w
 - **Automatic Location Detection**: Detects and displays weather information for the user's current location.
 - **Manual Location Setting**: Allows users to set and view weather information for any location of their choice.
 
-### Weather Alerts
-- **Push Notifications**: Sends notifications for severe weather alerts in the user's location using OneSignal.
-
 ### Multiple Locations
 - **Save and Switch Locations**: Users can save multiple locations and easily switch between them to view weather updates.
 
