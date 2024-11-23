@@ -45,3 +45,19 @@ The Weather App is a React application built with Vite that provides real-time w
    cd SkyTrek
    npm install
    npm run dev
+
+2. **Navigate to the SkyTrek directory and install dependencies**
+   ```bash
+  
+   cd SkyTrek
+   npm install
+
+3. **Create a .env file in the root directory and add your open weather api key**
+   ```bash
+  VITE_WEATHER_API_KEY=YOUR API KEY HERE  
+   
+
+
+4. **Run the project**
+   ```bash
+   npm run dev   
