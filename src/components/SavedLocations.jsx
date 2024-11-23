@@ -1,4 +1,4 @@
-// src/components/SavedLocations.jsx
+
 import React from 'react';
 import {
   Box,

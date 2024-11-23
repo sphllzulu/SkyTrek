@@ -1,4 +1,4 @@
-// src/components/HourlyForecast.jsx
+
 import React from 'react';
 import {
   Box,

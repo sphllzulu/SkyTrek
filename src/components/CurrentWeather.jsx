@@ -1,4 +1,4 @@
-// src/components/CurrentWeather.jsx
+
 import React from 'react';
 import {
   Box,
