@@ -1,148 +1,89 @@
-// src/utils/weatherAPI.js
-const API_KEY = 'edd1ebed1093c9728b7023e7926c7af4';
-const BASE_URL = 'https://api.openweathermap.org/data/2.5';
+// src/components/CurrentWeather.jsx
+import React from 'react';
+import {
+  Box,
+  Typography,
+  Grid,
+  CircularProgress,
+  Card,
+  CardContent
+} from '@mui/material';
+import { WbSunny, Opacity, Air } from '@mui/icons-material';
+import { useWeather } from '../context/WeatherContext';
 
-// export const weatherAPI = {
-//   async getWeatherData(location) {
-//     try {
-//       const [current, forecast] = await Promise.all([
-//         fetch(`${BASE_URL}/weather?q=${location}&appid=${API_KEY}&units=metric`),
-//         fetch(`${BASE_URL}/forecast?q=${location}&appid=${API_KEY}&units=metric`)
-//       ]);
+const CurrentWeather = ({ unit }) => {
+  const { currentWeather, loading, error } = useWeather();
 
-//       if (!current.ok || !forecast.ok) {
-//         throw new Error('Failed to fetch weather data');
-//       }
-
-//       const currentData = await current.json();
-//       const forecastData = await forecast.json();
-
-//       // Process and format the data
-//       return {
-//         current: {
-//           temp: currentData.main.temp,
-//           humidity: currentData.main.humidity,
-//           windSpeed: currentData.wind.speed,
-//           description: currentData.weather[0].description,
-//           icon: currentData.weather[0].icon
-//         },
-//         hourly: forecastData.list.slice(0, 24).map(item => ({
-//           time: new Date(item.dt * 1000),
-//           temp: item.main.temp,
-//           icon: item.weather[0].icon
-//         })),
-//         daily: this.processDailyForecast(forecastData.list)
-//       };
-//     } catch (error) {
-//       console.error('Error fetching weather data:', error);
-//       throw error;
-//     }
-//   },
-
-//   processDailyForecast(forecastList) {
-//     const dailyData = {};
-    
-//     forecastList.forEach(item => {
-//       const date = new Date(item.dt * 1000).toLocaleDateString();
-//       if (!dailyData[date]) {
-//         dailyData[date] = {
-//           temps: [],
-//           icons: []
-//         };
-//       }
-//       dailyData[date].temps.push(item.main.temp);
-//       dailyData[date].icons.push(item.weather[0].icon);
-//     });
-
-//     return Object.entries(dailyData).map(([date, data]) => ({
-//       date: new Date(date),
-//       maxTemp: Math.max(...data.temps),
-//       minTemp: Math.min(...data.temps),
-//       icon: this.getMostFrequentIcon(data.icons)
-//     })).slice(0, 7);
-//   },
-
-//   getMostFrequentIcon(icons) {
-//     return icons.sort((a, b) =>
-//       icons.filter(v => v === a).length - icons.filter(v => v === b).length
-//     ).pop();
-//   }
-// };
-
-export const weatherAPI = {
-  async getWeatherData(location) {
-    try {
-      // Check if location is coordinates (contains comma)
-      const isCoordinates = location.includes(',');
-      let lat, lon, queryString;
-
-      if (isCoordinates) {
-        [lat, lon] = location.split(',');
-        queryString = `lat=${lat}&lon=${lon}`;
-      } else {
-        queryString = `q=${location}`;
-      }
-
-      const [current, forecast] = await Promise.all([
-        fetch(`${BASE_URL}/weather?${queryString}&appid=${API_KEY}&units=metric`),
-        fetch(`${BASE_URL}/forecast?${queryString}&appid=${API_KEY}&units=metric`)
-      ]);
-
-      if (!current.ok || !forecast.ok) {
-        throw new Error('Failed to fetch weather data');
-      }
-
-      const currentData = await current.json();
-      const forecastData = await forecast.json();
-
-      return {
-        current: {
-          temp: currentData.main.temp,
-          humidity: currentData.main.humidity,
-          windSpeed: currentData.wind.speed,
-          description: currentData.weather[0].description,
-          icon: currentData.weather[0].icon,
-          location: currentData.name // Add city name to response
-        },
-        hourly: forecastData.list.slice(0, 24).map(item => ({
-          time: new Date(item.dt * 1000),
-          temp: item.main.temp,
-          icon: item.weather[0].icon
-        })),
-        daily: this.processDailyForecast(forecastData.list)
-      };
-    } catch (error) {
-      console.error('Error fetching weather data:', error);
-      throw error;
-    }
-  },
-
-  processDailyForecast(forecastList) {
-    const dailyData = {};
-    
-    forecastList.forEach(item => {
-      const date = new Date(item.dt * 1000).toLocaleDateString();
-      if (!dailyData[date]) {
-        dailyData[date] = {
-          temps: [],
-          icons: []
-        };
-      }
-      dailyData[date].temps.push(item.main.temp);
-      dailyData[date].icons.push(item.weather[0].icon);
-    });
-
-    return Object.entries(dailyData).map(([date, data]) => ({
-      date: new Date(date),
-      maxTemp: Math.max(...data.temps),
-      minTemp: Math.min(...data.temps),
-      icon: this.getMostFrequentIcon(data.icons)
-    })).slice(0, 7);
-  },
-
-  getMostFrequentIcon(icons) {
-    return icons.sort((a, b) =>
-      icons.filter(v => v === a).length - icons.filter(v => v === b).length
-    ).pop();
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" p={3}>
+        <CircularProgress color="primary" />
+      </Box>
+    );
   }
+
+  if (error) {
+    return (
+      <Typography color="error" align="center">
+        {error}
+      </Typography>
+    );
+  }
+
+  if (!currentWeather) {
+    return (
+      <Typography align="center">
+        Search for a location to see weather information
+      </Typography>
+    );
+  }
+
+  const convertTemp = (temp) => {
+    return unit === 'fahrenheit' ? (temp * 9/5) + 32 : temp;
+  };
+
+  return (
+    <Card>
+      <CardContent>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={6}>
+            <Box display="flex" alignItems="center">
+              <WbSunny sx={{ fontSize: 40, color: 'primary.main', mr: 2 }} />
+              <Box>
+                <Typography variant="h3">
+                  {Math.round(convertTemp(currentWeather.temp))}°
+                  {unit === 'celsius' ? 'C' : 'F'}
+                </Typography>
+                <Typography variant="h6" color="textSecondary">
+                  {currentWeather.description}
+                </Typography>
+              </Box>
+            </Box>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <Box display="flex" alignItems="center">
+                  <Opacity sx={{ mr: 1, color: 'primary.main' }} />
+                  <Typography>
+                    Humidity: {currentWeather.humidity}%
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid item xs={6}>
+                <Box display="flex" alignItems="center">
+                  <Air sx={{ mr: 1, color: 'primary.main' }} />
+                  <Typography>
+                    Wind: {currentWeather.windSpeed} m/s
+                  </Typography>
+                </Box>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+      </CardContent>
+    </Card>
+  );
 };
+
+export default CurrentWeather;
