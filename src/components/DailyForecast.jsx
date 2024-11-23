@@ -38,11 +38,22 @@ const DailyForecast = ({ unit }) => {
   };
 
   const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('en-US', {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric'
-    });
+    try {
+      // First check if date is a valid date string/timestamp
+      const dateObj = new Date(date);
+      if (isNaN(dateObj.getTime())) {
+        throw new Error('Invalid date');
+      }
+      return dateObj.toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric'
+      });
+    } catch (err) {
+      // Fallback handling
+      console.error('Date parsing error:', err);
+      return 'Invalid Date';
+    }
   };
 
   return (
