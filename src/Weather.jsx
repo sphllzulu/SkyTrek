@@ -69,7 +69,7 @@ function WeatherApp() {
   const fetchWeatherData = async (lat, lon) => {
     setWeather({ ...weather, loading: true });
     const url = 'https://api.openweathermap.org/data/2.5/onecall';
-    const api_key = import.meta.env.VITE_WEATHER_API_KEY; // Access environment variable
+    const api_key = import.meta.env.VITE_WEATHER_API_KEY; 
 
     try {
       const response = await axios.get(url, {
