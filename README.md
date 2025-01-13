@@ -4,6 +4,10 @@ Please click here for demo:https://skytrek.onrender.com
 
 The Weather App is a React application built with Vite that provides real-time weather information, including current conditions, hourly and daily forecasts. It offers location-based forecasting, push notifications for severe weather alerts, and multiple location support. Users can customize the app's theme and temperature units, access cached data offline, and enjoy a fast, optimized experience.
 
+## Screenshot
+![weather](https://github.com/user-attachments/assets/b9095b04-c95b-4c7b-a56e-a8a727538237)
+
+
 ## Features
 
 ### Real-time Weather Info
